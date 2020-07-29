@@ -1,9 +1,5 @@
 # Serpico
 
-# April 9th, 2020 - Archiving...
-
-I am currently looking for a new home for Serpico. Until we find a new maintainer and/or company it will remain read only. Thank you so much for 7(!) years with this project. 
-
 ## SimplE RePort wrIting and CollaboratiOn tool
 Serpico is a penetration testing report generation and collaboration tool. It was developed to cut down on the amount of time it takes to write a penetration testing report.
 
@@ -67,9 +63,4 @@ See also:
 * [Serpico Meta-Language In Depth](https://github.com/SerpicoProject/Serpico/wiki/Serpico-Meta-Language-In-Depth)
 
 
-## Support
-* [Wiki](https://github.com/MooseDojo/Serpico/wiki): We try to add most common questions to the wiki.
-* [Slack](https://serpicoproject.slack.com)
-* [Issue](https://github.com/SerpicoProject/Serpico/issues/new) : If you have found a bug or would like a new feature
-* [E-mail Support](https://www.serpicoproject.com/support/): For teams of users or template related questions
 
