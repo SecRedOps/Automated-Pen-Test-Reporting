@@ -122,7 +122,7 @@ class Server < Sinatra::Application
   set :dc, config_options['ldap_dc']
 
   enable :sessions
-  set :session_secret, rand(36**12).to_s(36)
+  set :session_secret, SecureRandom.hex(64)
 
   # load the default stuff
   Dir[File.join(File.dirname(__FILE__), 'routes', '*.rb')].each { |lib| require lib }

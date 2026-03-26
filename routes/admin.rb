@@ -351,18 +351,19 @@ post '/admin/plugin_upload' do
 
     return 'plugin.json does not exist in zip.' if config == ''
 
+    plugin_base_dir = File.expand_path("./plugins/#{config['name']}")
     Zip::File.open(rand_file) do |zipfile|
       # read the config file
       zipfile.each do |entry|
-        # Extract to file/directory/symlink
-        fn = "./plugins/#{config['name']}/" + entry.name
+        # Resolve the full destination path and ensure it stays within the plugin directory
+        fn = File.expand_path(entry.name, plugin_base_dir)
+        next unless fn.start_with?(plugin_base_dir + '/')
 
         # create the directory if dne
-        dirj = fn.split('/')
-        dirj.pop
-        FileUtils.mkdir_p(dirj.join('/')) unless File.directory?(dirj.join('/'))
+        dest_dir = File.dirname(fn)
+        FileUtils.mkdir_p(dest_dir) unless File.directory?(dest_dir)
 
-        next if fn[-1] == '/'
+        next if entry.directory?
         # Read into memory
         content = entry.get_input_stream.read
 
@@ -640,7 +641,7 @@ post '/admin/udo_templates' do
   data = url_escape_hash(request.POST)
 
   # Save new UDO template part
-  if data['action'] = 'Save'
+  if data['action'] == 'Save'
     new_udo_template = UserDefinedObjectTemplates.new
     new_udo_template.type = data['object_type']
     udo_properties = {}

@@ -127,13 +127,19 @@ post '/report/:id/restore_attachments' do
   rand_zip = "./tmp/#{rand(36**12).to_s(36)}.zip"
   File.open(rand_zip, 'wb') { |f| f.write(params[:file][:tempfile].read) }
   begin
+    attachments_dir = File.expand_path('./attachments')
     Zip::File.open(rand_zip) do |file|
       n = file.num_files
       n.times do |i|
         entry_name = file.get_name(i)
         file.fopen(entry_name) do |f|
-          clean_name = f.name.split('.')[0]
-          File.open("./attachments/#{clean_name}", 'wb') do |data|
+          # Strip path components and remove any non-safe characters to prevent path traversal
+          safe_name = File.basename(f.name.split('.')[0]).gsub(/[^a-zA-Z0-9_\-]/, '_')
+          next if safe_name.empty?
+          dest_path = File.expand_path(safe_name, attachments_dir)
+          # Ensure the destination is still within the attachments directory
+          next unless dest_path.start_with?(attachments_dir + '/')
+          File.open(dest_path, 'wb') do |data|
             data << f.read
           end
         end
@@ -1396,7 +1402,7 @@ get '/report/:id/generate' do
     next unless File.file?(appendice.filename_location)
     # the filename without the extension becomes the xml tag
     appendice_xml = "<#{appendice.filename.split('.')[0]}>"
-    appendice_xml += Nokogiri::XML(File.open(appendice.filename_location).read).root.to_xml
+    appendice_xml += Nokogiri::XML(File.open(appendice.filename_location).read) { |config| config.nonet.noblanks }.root.to_xml
     appendice_xml += "</#{appendice.filename.split('.')[0]}>"
     all_appendices_xml += appendice_xml.to_s
 
